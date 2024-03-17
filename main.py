@@ -16,28 +16,23 @@ def post_request():
     manifest = ManifestClass()
     service_names = manifest.serch_servicename()
     file_names = manifest.serch_filename(service_names)
-    return file_names
+    json_data = manifest.result_json(service_names, file_names)
+    return json_data
 
 @app.route('/<string:services>/<string:kinds>', methods=["GET"])
 def yml_to_json (services, kinds):
-    # filesの中身にあるサービスのymlファイルをjson形式に変換する処理
-    with open(f'files/{services}/{kinds}.yml') as file:
-        yml = yaml.safe_load(file)
-        js = json.dumps(yml, indent=2)
-    return  js
+    try:
+        # filesの中身にあるサービスのymlファイルをjson形式に変換する処理
+        with open(f'files/{services}/{kinds}.yml') as file:
+            yml = yaml.safe_load(file)
+            js = json.dumps(yml, indent=2)
+        return  js
+    except FileNotFoundError:
+        response = "error"
+        return response
 
 class ManifestClass:
-    # servie名からファイル名を取り出す
-    def serch_filename(self, services_name):
-        file_name = []
-        for service_name in services_name:
-            paths = glob.glob(f'files/{service_name}/*')
-            for path in paths:
-                name = os.path.splitext(os.path.basename(path))[0]
-                file_name.append(name)
-        return file_name
-    
-    # service名をlist形式で返す
+     # service名をlist形式で返す
     def serch_servicename(self):
         file_paths = []
         service_name = []
@@ -50,9 +45,25 @@ class ManifestClass:
             parts = service_paths.split("/")
             service_name.append(parts[1])
         return service_name
-    def result_json():
-        # jsonify({'file_paths': file_paths})
-        return
+    # servie名からファイル名を取り出す
+    def serch_filename(self, service_names):
+        file_name = []
+        for service_name in service_names:
+            paths = glob.glob(f'files/{service_name}/*')
+            service_files = []
+            for path in paths:
+                name = os.path.splitext(os.path.basename(path))[0]
+                service_files.append(name)
+            file_name.append(service_files)
+        return file_name
+   
+    def result_json(self, service_names, file_names):
+        raw_data = {}
+        for service_name, file_name in zip(service_names, file_names):
+            print(service_name, file_name)
+            raw_data[service_name] = file_name
+        json_data = json.dumps(raw_data)
+        return json_data
     
 if __name__ == '__main__':
     app.debug = True

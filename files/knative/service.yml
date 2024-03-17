@@ -6,4 +6,4 @@ spec:
   template:
     spec:
       containers:
-        - image: gcr.io/knative-releases/knative.dev/net-containers/cmd/httpproxy
+        - image: myapp
