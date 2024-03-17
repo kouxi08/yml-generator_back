@@ -17,15 +17,18 @@ def post_request():
 
 @app.route('/<string:services>/<string:kinds>', methods=["GET"])
 def yml_to_json (services, kinds):
+    yaml_path =  f'files/{services}/{kinds}.yml'
+    # ファイルがあるかの確認
+    if not os.path.exists(yaml_path):
+        return "not service or kind"
+    
     try:
         # filesの中身にあるサービス.ymlファイルをjson形式に変換する処理
         with open(f'files/{services}/{kinds}.yml') as file:
             yml = yaml.safe_load(file)
-            js = json.dumps(yml, indent=2)
-        return  js
-    except FileNotFoundError:
-        response = "error"
-        return response
+            return  json.dumps(yml, indent=2)
+    except Exception as e:
+        return f"error: {e}"
     
 #filesフォルダにあるフォルダ名とファイル名をjson形式にして返却するやつ
 class ManifestClass:
