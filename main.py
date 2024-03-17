@@ -7,10 +7,6 @@ from flask import Flask, jsonify
 
 app  = Flask(__name__)
 
-@app.route("/test")
-def index():
-    return "Hello World"
-
 @app.route('/', methods=["POST"])
 def post_request():
     manifest = ManifestClass()
@@ -22,7 +18,7 @@ def post_request():
 @app.route('/<string:services>/<string:kinds>', methods=["GET"])
 def yml_to_json (services, kinds):
     try:
-        # filesの中身にあるサービスのymlファイルをjson形式に変換する処理
+        # filesの中身にあるサービス.ymlファイルをjson形式に変換する処理
         with open(f'files/{services}/{kinds}.yml') as file:
             yml = yaml.safe_load(file)
             js = json.dumps(yml, indent=2)
@@ -30,9 +26,10 @@ def yml_to_json (services, kinds):
     except FileNotFoundError:
         response = "error"
         return response
-
+    
+#filesフォルダにあるフォルダ名とファイル名をjson形式にして返却するやつ
 class ManifestClass:
-     # service名をlist形式で返す
+     # サービス名をlist形式で返す
     def serch_servicename(self):
         file_paths = []
         service_name = []
@@ -41,11 +38,11 @@ class ManifestClass:
         for path in paths:
             file_paths.append(glob.glob(f'{path}/*'))
         for file_path in file_paths:
-            service_paths = file_path[0]
-            parts = service_paths.split("/")
+            parts = file_path[0].split("/")
             service_name.append(parts[1])
         return service_name
-    # servie名からファイル名を取り出す
+    
+    # サービス名からファイル名を取り出す
     def serch_filename(self, service_names):
         file_name = []
         for service_name in service_names:
@@ -56,7 +53,8 @@ class ManifestClass:
                 service_files.append(name)
             file_name.append(service_files)
         return file_name
-   
+    
+    # サービス名とファイル名を結合させる処理
     def result_json(self, service_names, file_names):
         raw_data = {}
         for service_name, file_name in zip(service_names, file_names):
