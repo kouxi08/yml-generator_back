@@ -2,9 +2,12 @@ version: "3"
 services:
   app:
     build: .
+    container_name: yml_generator
+    hostname: yml_backend
     ports:
       - "5001:5000"
     container_name: app
     volumes:
       - .:/usr/src/app
     tty: true
+    
