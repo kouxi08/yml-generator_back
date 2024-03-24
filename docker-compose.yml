@@ -3,11 +3,15 @@ services:
   app:
     build: .
     container_name: yml_generator
-    hostname: yml_backend
+    hostname: yml-backend
     ports:
       - "5001:5000"
-    container_name: app
     volumes:
       - .:/usr/src/app
     tty: true
-    
+    networks:
+      - yml-generator
+
+networks:
+  yml-generator:
+    external: true
